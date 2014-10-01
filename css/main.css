@@ -1,0 +1,79 @@
+body {
+  font-family: 'Open Sans', sans-serif;
+}
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+#control {
+  text-align: center;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  height: 30%;
+  width: 40%;
+  background-color:rgba(170, 170, 170, 0.7);
+  border-radius: 0 20px 0 0;
+}
+#control-header {
+  margin-left: 10px;
+  color: white;
+}
+#time-div {
+  vertical-align: bottom;
+  margin-left: auto;
+  margin-right: auto;
+  text-align:center;
+}
+#am-pm {
+  height: 40px;
+  font-size: 35px;
+  display: inline;
+  background-color: transparent;
+  border: 2px white solid;
+  width: 80px;
+}
+#am-pm:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+#am-pm:active {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+#go-to-time {
+  margin-top: 10px;
+}
+.pretty-button {
+  width: 100px;
+  height: 50px;
+  border-radius: 5px;
+  margin-top: -10px;
+  border: 2px white solid; 
+  color: white;
+  background-color: rgb(148, 212, 148);
+}
+.pretty-button:hover {
+  background-color: rgb(200, 212, 148);
+}
+.time-input {
+  display: inline;
+  background-color: rgba(0,0,0,0.0);
+  width: 70px;
+  border: 2px white solid;
+}
+.digital-font {
+  color: white;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 40px;
+}
+#go-to-time.disabled {
+  background-color: gray;
+}
+.red:hover {
+  background-color: rgba(230, 0, 0, 1.0);
+}
+.red {
+  background-color: red;
+}

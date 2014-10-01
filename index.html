@@ -1,0 +1,203 @@
+<!--
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Orbitron' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="bower_components/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="css/main.css" />
+  </head>
+  <body>
+    <div id="map"></div>
+    <div id="control">
+      <h1 id="control-header">Select a time</h1>
+      <div id="time-div">
+        <input type="text" id="time-hr" maxLength="2" class="digital-font time-input" value="12">
+        <span class="digital-font">:</span>
+        <input type="text" id="time-min" maxLength="2" class="digital-font time-input" value="00">
+        <button id="am-pm" class="digital-font">AM</button>
+      </div>
+      <button id="go-to-time" class="pretty-button">Jump To Time</button>
+      <button id="animate" class="pretty-button">Animate</button>
+    </div>
+    <script src="js/d3.js"></script>
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/leaflet/dist/leaflet.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/data-accessor.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>
+
+-->
+
+
+<!doctype html>
+
+<link rel="stylesheet" href="bower_components/leaflet/dist/leaflet.css" />
+<link rel="stylesheet" href="css/main.css" />
+<script src="js/d3.js"></script>
+<script src="js/underscore.js"></script>
+<script src="js/jquery.min.js"></script>
+<script src="bower_components/leaflet/dist/leaflet.js"></script>
+
+<div id="">
+  <svg id="chart" width=1200 height=700 style=""></svg>
+</div>
+<div id="label"></div>
+<div id="map"></div>
+
+<script>
+
+$(function() {
+  var w = $(document).width()-30,
+      h = $(document).height() - 50;
+  $("#chart").width(w).height(h);
+
+  var Lcircles = {}
+  var graphit = function(data) {
+    var okrooms = {};
+    d3.nest().key(function(d) { return d.room; })
+      .entries(data)
+      .filter(function(d) { return d3.max(d.values, function(dd) { return dd.count; }) > 10; })
+      .map(function(d) { okrooms[d.key] = 1; return d.key; })
+    data = data.filter(function(d) { return d.lon >= 42.3 && d.lon <= 42.39 && okrooms[d.room]; })
+
+
+    // group by time
+    nest = d3.nest()
+      .key(function(d) { return d.time; })
+      .entries(data)
+      .map(function(d) { return { key: new Date(d.key), values: d.values }; });
+    nest.sort(function(a,b) { return a.key - b.key; })
+
+    times = nest.map(function(d) { return d.key;});
+    console.log(times)
+    timedData = nest.map(function(d) { return d.values;});
+
+    var chart = d3.select("#chart")
+    var els = chart.selectAll("circle")
+    var label = d3.select("#label");
+
+    var tmin = d3.min(data, function(d){return d.time})
+    var tmax = d3.max(data, function(d){return d.time})
+    var latmin = d3.min(data, function(d) { return d.lat})
+    var latmax = d3.max(data, function(d) { return d.lat})
+    var lonmin = d3.min(data, function(d) { return d.lon})
+    var lonmax = d3.max(data, function(d) { return d.lon})
+    var countmax = d3.max(data, function(d){return d.count})
+    var color = d3.scale.linear().domain([1, .05*countmax, 0.1*countmax, .5*countmax, .8*countmax]).range(["#eee", "#ccc", "rgb(255, 174, 174)", "rgb(255, 88, 88)", "red"]).clamp(true)
+    //latmin = 42.343;
+    //latmax = 42.394;
+    //lonmin = -71.12;
+    //lonmax = -71.0780335;
+    var r = d3.scale.log().domain([1, countmax]).range([0, 20]).clamp(true)
+    var x = d3.scale.linear().domain([latmin, latmax]).range([10, w-10])
+    var y = d3.scale.linear().domain([lonmin, lonmax]).range([h-10, 10])
+    t = d3.scale.linear().domain([tmin, tmax]).range([10, w-10]);
+    console.log([countmax, tmin, tmax, latmin, latmax, lonmin, lonmax])
+
+    overtime = times.map(function(time, i) {
+      return { 'time': new Date(time), count: d3.mean(timedData[i].map(function(d) { return d.count; })) };
+    });
+    countmax = d3.max(overtime, function(d) {return d.count; })
+    var ly = d3.scale.linear().domain([1, countmax]).range([h, h-100]).clamp(true)
+    var line = d3.svg.line()
+      .x(function(d){return t(d.time); })
+      .y(function(d){return ly(d.count); });
+      chart.append('path')
+        .attr('d', line(overtime))
+        .style("fill", "none")
+        .style('stroke-width', 2)
+        .style("stroke", "#ccc")
+
+    var timept = chart.append('circle')
+      .attr('r', 5)
+      .style('fill', 'black')
+
+    
+    var frameidx = 0;
+
+    els.data(timedData[0])
+      .enter()
+      .append('circle')
+      .classed('room', true)
+      .attr('opacity', 0.8)
+      .attr('cx', function(d) {
+        //Lcircles[d.room] = L.circle([d.lat, d.lon], 100).addTo(map);
+        return x(d.lat) })
+      .attr('cy', function(d) { return y(d.lon) })
+      .attr('r', function(d, idx) { return r(d.count); })
+      .attr('fill', function(d) { return color(d.count) })
+
+
+    var plot_frame = function() {
+      if (frameidx >= timedData.length) frameidx = 0;
+    label.text(times[frameidx])
+    timept
+      .attr('cx', t(overtime[frameidx].time))
+      .attr('cy', ly(overtime[frameidx].count))
+
+      chart.selectAll('circle.room').data(timedData[frameidx])
+      .attr('r', function(d) { 
+        //Lcircles[d.room].setRadius(d.count / 2);
+        
+        return r(d.count); })
+        .attr('fill', function(d) { return color(d.count) })
+      frameidx = frameidx + 1
+    }
+
+    setInterval(function() { 
+      plot_frame();
+    }, 100);
+
+
+  /*
+    d3.selectAll('circle').transition()
+    .delay(function(d,i){return 4000 + i/(data.length) * 2000})
+    .attr('r', 5)
+    .transition()
+    .attr('cy', function(d) { return y(d.count) })
+  */
+
+
+  }
+
+
+
+
+
+
+
+
+
+
+
+  d3.select("#label").text('loading')
+  d3.csv("util/data.csv", function(d) {
+    return {
+      lon: +d.lat,
+      lat: +d.lon,
+      room: d.room,
+      time: new Date(+d.time * 1000),
+      count: +d.count,
+    };
+
+  }, function(err, rows) {
+    data = rows
+    graphit(rows);
+  })
+
+
+  if (false) {
+    map = L.map('map').setView([42.360183,-71.090469], 17);
+
+    // add an OpenStreetMap tile layer
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+  }
+
+})
+
+</script>
