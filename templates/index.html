@@ -34,10 +34,10 @@
 
 <!doctype html>
 
-<link rel="stylesheet" href="css/main.css" />
-<script src="js/d3.js"></script>
-<script src="js/underscore.js"></script>
-<script src="js/jquery.min.js"></script>
+<link rel="stylesheet" href="/static/css/main.css" />
+<script src="/static/js/d3.js"></script>
+<script src="/static/js/underscore.js"></script>
+<script src="/static/js/jquery.min.js"></script>
 
 <div id="">
   <svg id="chart" width=1200 height=700 style=""></svg>
@@ -171,8 +171,8 @@ $(function() {
 
 
 
-  d3.select("#label").text('loading')
-  d3.csv("util/data.csv", function(d) {
+  d3.select("#label").text('Downloading around 40MB of data!')
+  d3.csv("/static/data.csv", function(d) {
     return {
       lon: +d.lat,
       lat: +d.lon,
