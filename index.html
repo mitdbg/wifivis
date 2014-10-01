@@ -34,12 +34,10 @@
 
 <!doctype html>
 
-<link rel="stylesheet" href="bower_components/leaflet/dist/leaflet.css" />
 <link rel="stylesheet" href="css/main.css" />
 <script src="js/d3.js"></script>
 <script src="js/underscore.js"></script>
 <script src="js/jquery.min.js"></script>
-<script src="bower_components/leaflet/dist/leaflet.js"></script>
 
 <div id="">
   <svg id="chart" width=1200 height=700 style=""></svg>
@@ -174,7 +172,7 @@ $(function() {
 
 
   d3.select("#label").text('loading')
-  d3.csv("util/data.csv", function(d) {
+  d3.csv("util/data.csv.gz", function(d) {
     return {
       lon: +d.lat,
       lat: +d.lon,

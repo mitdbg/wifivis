@@ -1,3 +1,19 @@
+# Initial Setup
+
+We include some data already.  Simply decompress the file `util/data.csv.gz`
+
+
+# Usage
+
+
+Go to root of the repo and run an HTTP Server:
+
+    python -m SimpleHTTPServer
+
+Navigate your browser to `http://localhost:8000/`
+
+
+
 # Prep new wifi data
 
 Add `logs` file in `util/` with schema `timestamp/count/accesspointid`.  It should look like this:
@@ -29,12 +45,4 @@ First few lines in `util/data.csv` should look like:
     1411725853,w1-3032,5,-71.093457,42.357710
 
 
-# Usage
-
-
-Go to root of the repo and run an HTTP Server:
-
-    python -m SimpleHTTPServer
-
-Navigate your browser to `http://localhost:8000/`
 
