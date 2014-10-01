@@ -172,7 +172,7 @@ $(function() {
 
 
   d3.select("#label").text('loading')
-  d3.csv("util/data.csv.gz", function(d) {
+  d3.csv("util/data.csv", function(d) {
     return {
       lon: +d.lat,
       lat: +d.lon,
