@@ -20,7 +20,7 @@ for line in file('logs'):
   tstamp,count,id =  line.strip().split(',')
   count = int(count)
   tstamp = int(tstamp )
-  if prevtstamp is not None and tstamp != prevtstamp and tstamp - prevtstamp < 60 * 15:
+  if prevtstamp is not None and tstamp != prevtstamp and tstamp - prevtstamp < 60 * 25:
     continue
 
   if tstamp != prevtstamp:
