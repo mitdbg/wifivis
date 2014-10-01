@@ -38,8 +38,10 @@
 <script src="/static/js/d3.js"></script>
 <script src="/static/js/underscore.js"></script>
 <script src="/static/js/jquery.min.js"></script>
+<style>
+</style>
 
-<div id="">
+<div id="bg">
   <svg id="chart" width=1200 height=700 style=""></svg>
 </div>
 <div id="label"></div>
@@ -51,6 +53,35 @@ $(function() {
   var w = $(document).width()-30,
       h = $(document).height() - 50;
   $("#chart").width(w).height(h);
+  var chart = d3.select("#chart")
+  var els = chart.selectAll("circle")
+  var label = d3.select("#label");
+
+  var latmin = -71.1069974; var latmax = -71.076615; var lonmin = 42.3539066; var lonmax = 42.366946;
+
+
+  var graphblgs = function(data) {
+      var nest = d3.nest()
+        .key(function(d) { return d.id; })
+        .entries(data)
+
+      var x = d3.scale.linear().domain([latmin, latmax]).range([10, w-10])
+      var y = d3.scale.linear().domain([lonmin, lonmax]).range([h-10, 10])
+      var line = d3.svg.line()
+        .x(function(d){return x(d.lat); })
+        .y(function(d){return y(d.lon); });
+  
+        console.log(nest)
+      chart.selectAll('path.blg').data(nest)
+        .enter().append('path')
+        .attr('class', 'blg')
+        .attr('d', function(d) { return line(d.values) + "Z"; })
+        .style("fill", "none")
+        .style('stroke-width', 1)
+        .style("stroke", "#ccc")
+
+      
+  }
 
   var Lcircles = {}
   var graphit = function(data) {
@@ -70,25 +101,18 @@ $(function() {
     nest.sort(function(a,b) { return a.key - b.key; })
 
     times = nest.map(function(d) { return d.key;});
-    console.log(times)
     timedData = nest.map(function(d) { return d.values;});
-
-    var chart = d3.select("#chart")
-    var els = chart.selectAll("circle")
-    var label = d3.select("#label");
 
     var tmin = d3.min(data, function(d){return d.time})
     var tmax = d3.max(data, function(d){return d.time})
-    var latmin = d3.min(data, function(d) { return d.lat})
-    var latmax = d3.max(data, function(d) { return d.lat})
-    var lonmin = d3.min(data, function(d) { return d.lon})
-    var lonmax = d3.max(data, function(d) { return d.lon})
     var countmax = d3.max(data, function(d){return d.count})
     var color = d3.scale.linear().domain([1, .05*countmax, 0.1*countmax, .5*countmax, .8*countmax]).range(["#eee", "#ccc", "rgb(255, 174, 174)", "rgb(255, 88, 88)", "red"]).clamp(true)
-    //latmin = 42.343;
-    //latmax = 42.394;
-    //lonmin = -71.12;
-    //lonmax = -71.0780335;
+    //var latmin = d3.min(data, function(d) { return d.lat})
+    //var latmax = d3.max(data, function(d) { return d.lat})
+    //var lonmin = d3.min(data, function(d) { return d.lon})
+    //var lonmax = d3.max(data, function(d) { return d.lon})
+
+
     var r = d3.scale.log().domain([1, countmax]).range([0, 20]).clamp(true)
     var x = d3.scale.linear().domain([latmin, latmax]).range([10, w-10])
     var y = d3.scale.linear().domain([lonmin, lonmax]).range([h-10, 10])
@@ -103,11 +127,11 @@ $(function() {
     var line = d3.svg.line()
       .x(function(d){return t(d.time); })
       .y(function(d){return ly(d.count); });
-      chart.append('path')
-        .attr('d', line(overtime))
-        .style("fill", "none")
-        .style('stroke-width', 2)
-        .style("stroke", "#ccc")
+    chart.append('path')
+      .attr('d', line(overtime))
+      .style("fill", "none")
+      .style('stroke-width', 2)
+      .style("stroke", "#ccc")
 
     var timept = chart.append('circle')
       .attr('r', 5)
@@ -172,6 +196,17 @@ $(function() {
 
 
   d3.select("#label").text('Downloading around 40MB of data!')
+  d3.csv("/static/blgs.csv", function(d) {
+    return {
+      lon: +d.lat,
+      lat: +d.lon,
+      id: d.id
+    }
+  }, function(err, rows) {
+    console.log(rows[0]);
+    graphblgs(rows);
+  });
+
   d3.csv("/static/data.csv", function(d) {
     return {
       lon: +d.lat,
