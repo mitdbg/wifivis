@@ -12,7 +12,7 @@
 <div id="bg">
   <svg id="chart" width=1200 height=700 style=""></svg>
 </div>
-<div><span id="label"></span><span style="margin-left: 3ex">← to reverse.  → to play forward.  space to start/stop.</span></div>
+<div><span id="label"></span><span style="margin-left: 3ex">space: start/stop.   ← : back a frame.  →: forward a frame.</span></div>
 <div id="map"></div>
 </body>
 
@@ -32,6 +32,7 @@ $(function() {
   var frameidx = 0;
   var dframeidx = 1;
   var running = true;
+  var plot_frame; // function to render a frame
 
   d3.select("body")
     .on("keydown", function() {
@@ -39,14 +40,12 @@ $(function() {
         running = !running;
       } else if (d3.event.keyCode == 37) { // left arrow
         dframeidx = -1;
-        running = true;
+        plot_frame(true);
       } else if (d3.event.keyCode = 39) { // right arrow
         dframeidx = 1;
-        running = true;
+        plot_frame(true);
       }
-    })
-
-
+    });
 
 
 
@@ -130,8 +129,8 @@ $(function() {
       .attr('fill', function(d) { return color(d.count) })
 
 
-    var plot_frame = function() {
-      if (!running) return;
+    plot_frame = function(oneframe) {
+      if (!running && oneframe === undefined) return;
       if (frameidx >= timedData.length) frameidx = 0;
       if (frameidx < 0) frameidx = timedData.length-1;
       label.text(times[frameidx])
