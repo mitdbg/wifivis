@@ -1,4 +1,20 @@
+from collections import *
 import json
+
+
+def bad_rooms(mincount):
+  counts = defaultdict(lambda: 0)
+  for line in file('logs'):
+    tstamp,count,id =  line.strip().split(',')
+    count = int(count)
+
+    id = int(id)
+    rm = id2rm[id]
+    rmid = '-'.join(rm.split('-')[:2])
+    counts[rmid] = max(counts[rmid], count)
+
+  return [rm for rm, c in counts.iteritems() if c < mincount]
+
 
 rm2id = json.load(file('locs.json'))
 id2rm = {id:rm for rm,id in rm2id.iteritems()}
@@ -16,10 +32,12 @@ for rm, id in rm2id.iteritems():
 print "time,room,count,lon,lat"
 prevtstamp = None
 roomcounts = {}  # room -> (count, lat, lon)
+badrooms = set(bad_rooms(10))
+print badrooms
 for line in file('logs'):
   tstamp,count,id =  line.strip().split(',')
   count = int(count)
-  tstamp = int(tstamp )
+  tstamp = int(tstamp)
   if prevtstamp is not None and tstamp != prevtstamp and tstamp - prevtstamp < 60 * 25:
     continue
 
@@ -33,6 +51,8 @@ for line in file('logs'):
   id = int(id)
   rm = id2rm[id]
   rmid = '-'.join(rm.split('-')[:2])
+  if rmid in badrooms:
+    continue
   if rmid in wifiap:
     lon, lat = wifiap[rmid]
     if lon == 0 or lat == 0: continue
