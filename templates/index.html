@@ -133,6 +133,7 @@ $(function() {
       if (!running && oneframe === undefined) return;
       if (frameidx >= timedData.length) frameidx = 0;
       if (frameidx < 0) frameidx = timedData.length-1;
+      frameidx = frameidx + dframeidx;
       label.text(times[frameidx])
       timept
         .attr('cx', t(overtime[frameidx].time))
@@ -141,7 +142,6 @@ $(function() {
       chart.selectAll('circle.room').data(timedData[frameidx])
         .attr('r', function(d) { return r(d.count); })
         .attr('fill', function(d) { return color(d.count) })
-      frameidx = frameidx + dframeidx;
     }
 
     setInterval(function() { 
