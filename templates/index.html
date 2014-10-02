@@ -95,7 +95,7 @@ $(function() {
     //var lonmin = d3.min(data, function(d) { return d.lon})
     //var lonmax = d3.max(data, function(d) { return d.lon})
 
-    var r = d3.scale.log().domain([1, countmax]).range([0, 20]).clamp(true)
+    var r = d3.scale.log().domain([1,  0.8*countmax, countmax]).range([0, 13, 20]).clamp(true)
     t = d3.scale.linear().domain([tmin, tmax]).range([10, w-10]);
     console.log([countmax, tmin, tmax, latmin, latmax, lonmin, lonmax])
 
