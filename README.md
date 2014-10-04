@@ -6,11 +6,11 @@ We include some data already.  Simply decompress the file `util/data.csv.gz`
 # Usage
 
 
-Go to root of the repo and run an HTTP Server:
+Go to root of the repo and run the server in threaded mode
 
-    python -m SimpleHTTPServer
+    python server.py --threaded <IP or Hostname> <PORT>
 
-Navigate your browser to `http://localhost:8000/`
+Navigate your browser to `http://<IP or Hostname>:<PORT>/`
 
 
 
