@@ -46,3 +46,13 @@ First few lines in `util/data.csv` should look like:
 
 
 
+
+# Scrape Wifi Data
+
+Go to `scrape/` 
+
+Edit scrape_wifi.py and set the usernames and passwords
+
+Run it
+
+    python scrape_wifi.py
